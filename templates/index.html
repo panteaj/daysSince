@@ -1,142 +1,163 @@
 <!DOCTYPE html>
 <html lang="no">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dato Kalkulator</title>
-    <link rel="manifest" href="/manifest.json">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dato Kalkulator</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<style>
+*{box-sizing:border-box;}
 
-        body {
-            font-family: Arial;
-            background: linear-gradient(120deg, #5f9cff, #8fd3f4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+body{
+    font-family:Arial;
+    background:linear-gradient(120deg,#5f9cff,#8fd3f4);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    margin:0;
+    transition:0.4s;
+}
 
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 420px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
+.container{
+    background:white;
+    padding:30px;
+    border-radius:20px;
+    width:90%;
+    max-width:420px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+    transition:0.4s;
+}
 
-        input,
-        button {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 12px;
-            border: 2px solid #ccc;
-            font-size: 16px;
-        }
+input,button{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border-radius:12px;
+    border:2px solid #ccc;
+    font-size:16px;
+    transition:0.3s;
+}
 
-        button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-        }
+button{
+    background:#4CAF50;
+    color:white;
+    border:none;
+    font-weight:bold;
+    cursor:pointer;
+}
 
-       
-        .darkBtn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: none;
-            font-size: 22px;
-            background: white;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
+/* 🌙 Dark button */
+.darkBtn{
+    position:fixed;
+    top:20px;
+    right:20px;
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    border:none;
+    font-size:22px;
+    background:white;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(0,0,0,0.2);
+    transition:0.4s;
+}
 
-        .dark body {
-            background: #111;
-        }
+.dark .darkBtn{
+    transform:rotate(180deg);
+    background:#333;
+    color:white;
+}
 
-        .dark .container {
-            background: #222;
-            color: white;
-        }
-
-        .dark input {
-            background: #333;
-            color: white;
-            border-color: #555;
-        }
-
-        .darkBtn.dark {
-            background: #333;
-            color: white;
-        }
-    </style>
+/* 🌙 Dark mode */
+.dark body{background:linear-gradient(120deg,#1e1e2f,#2c2c3a);}
+.dark .container{background:#222;color:white;}
+.dark input{background:#333;color:white;border-color:#555;}
+.dark button{background:#5fbf63;}
+</style>
 </head>
 
 <body>
-    <button class="darkBtn" onclick="toggleDark()">🌙</button>
 
-    <div class="container">
-        <h2>📅 Dato Kalkulator</h2>
-        <input  type="date" id="startInput">
-        <input  type="date" id="endInput">
-        <button onclick="count()">Regn ut</button>
-        <div id="result"></div>
+<button class="darkBtn" onclick="toggleDark()">🌙</button>
 
-        <h2>🎂 Alder</h2>
-        <input  type="date" id="birthInput">
-        <button onclick="age()">Beregn</button>
-        <div id="ageResult"></div>
-    </div>
+<div class="container">
+<h2>📅 Dato Kalkulator</h2>
+<input type="date" id="startInput">
+<input type="date" id="endInput">
+<button onclick="count()">Regn ut</button>
+<div id="result"></div>
 
-    <script>
-        function parseNorwegianDate(str) {
-            let [d, m, y] = str.split(".");
-            return `${y}-${m}-${d}`;
-        }
+<h2>🎂 Alder</h2>
+<input type="date" id="birthInput">
+<button onclick="age()">Beregn</button>
+<div id="ageResult"></div>
+</div>
 
-        async function count() {
-            let start = parseNorwegianDate(startInput.value);
-            let end = parseNorwegianDate(endInput.value);
+<script>
+function formatNorwegian(dateStr){
+    let d=new Date(dateStr);
+    let day=String(d.getDate()).padStart(2,"0");
+    let month=String(d.getMonth()+1).padStart(2,"0");
+    let year=d.getFullYear();
+    return `${day}.${month}.${year}`;
+}
 
-            let res = await fetch("/count", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ start, end })
-            });
-            let d = await res.json();
-            result.innerHTML = `${d.days} dager<br>${d.years} år og ${d.months} måneder`;
-        }
+async function count(){
+    let start=startInput.value;
+    let end=endInput.value;
 
-        async function age() {
-            let birth = parseNorwegianDate(birthInput.value);
-            let res = await fetch("/age", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ birth })
-            });
-            let d = await res.json();
-            ageResult.innerHTML = `${d.years} år og ${d.months} måneder (${d.days} dager)`;
-        }
+    if(!start||!end){alert("Velg begge datoer");return;}
 
-        function toggleDark() {
-            document.documentElement.classList.toggle("dark");
-        }
-    </script>
+    let res=await fetch("/count",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({start,end})
+    });
+
+    let d=await res.json();
+
+    result.innerHTML=`
+        Fra ${formatNorwegian(start)} til ${formatNorwegian(end)}<br>
+        ${d.days} dager<br>
+        ${d.years} år og ${d.months} måneder
+    `;
+}
+
+async function age(){
+    let birth=birthInput.value;
+    if(!birth){alert("Velg fødselsdato");return;}
+
+    let res=await fetch("/age",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({birth})
+    });
+
+    let d=await res.json();
+
+    ageResult.innerHTML=`
+        Født ${formatNorwegian(birth)}<br>
+        ${d.years} år og ${d.months} måneder<br>
+        (${d.days} dager)
+    `;
+}
+
+function toggleDark(){
+    document.documentElement.classList.toggle("dark");
+
+    if(document.documentElement.classList.contains("dark")){
+        localStorage.setItem("dark","yes");
+    }else{
+        localStorage.removeItem("dark");
+    }
+}
+
+if(localStorage.getItem("dark")){
+    document.documentElement.classList.add("dark");
+}
+</script>
+
 </body>
-
 </html>
